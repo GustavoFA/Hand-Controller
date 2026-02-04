@@ -17,9 +17,10 @@ class HandTracker:
     FONT_THICKNESS = 1
     HANDEDNESS_TEXT_COLOR = (88, 205, 54) # vibrant green
 
-    HAND_KNUCKLE = ['WRIST', 'THUMB_CMC', 'THUMB_MCP', 'THUMB_IP', 'THUMB_TIP', 'INDEX_FINGER_MCP', 'INDEX_FINGER_PIP', 'INDEX_FINGER_DIP',
+    HAND_KNUCKLES = ['WRIST', 'THUMB_CMC', 'THUMB_MCP', 'THUMB_IP', 'THUMB_TIP', 'INDEX_FINGER_MCP', 'INDEX_FINGER_PIP', 'INDEX_FINGER_DIP',
                     'INDEX_FINGER_TIP', 'MIDDLE_FINGER_MCP', 'MIDDLE_FINGER_PIP', 'MIDDLE_FINGER_DIP', 'MIDDLE_FINGER_TIP', 'RING_FINGER_MCP',
                     'RING_FINGER_PIP', 'RING_FINGER_DIP', 'RING_FINGER_TIP', 'PINKY_MCP', 'PINKY_PIP', 'PINKY_DIP', 'PINKY_TIP']
+    HAND_KNUCKLES_COORDINATES = []
 
     def __init__(self, model_path:str="hand_landmarker.task", num_hands:int=1):
         # creating the handlandmarker objetct
@@ -81,7 +82,7 @@ class HandTracker:
                         return None
                 elif isinstance(region, str):
                     try:
-                        region = self.HAND_KNUCKLE.index(region.upper())
+                        region = self.HAND_KNUCKLES.index(region.upper())
                     except ValueError as e:
                         print(f'Region name not find - {e}')
                         return None
@@ -103,27 +104,41 @@ class HandTracker:
             print(f"ERROR - {e}")
             return None
 
-
-    def get_all_knuckle_coordinates(self, target_score:float=0.98):
+    # TODO:
+        # just take the first hand 
+    def update_knuckles_coordinates(self, target_score:float=0.98, n_hands:int=1) -> bool:
         detection_result = self.get_results()
         try:
             if not detection_result.hand_landmarks:
                 print("Couldn't find any hand landmark")
-                return None
+                return False
             else:
-                hand_landmarks_list = detection_result.hand_landmarks
-                handedness_list = detection_result.handedness
-                coordinates = {}
-                for idx in range(len(hand_landmarks_list)):
-                    hand_landmarks = hand_landmarks_list[idx]
-                    handedness = handedness_list[idx][0].display_name
-                    hand_score = handedness_list[idx][0].score
-                    if hand_score < target_score:
-                        continue
-                    coordinates[handedness] = {}
-                    for i, landmarks in enumerate(hand_landmarks):
-                        coordinates[handedness][self.HAND_KNUCKLE[i]] = (landmarks.x, landmarks.y, landmarks.z)
-                return coordinates
+                # hand_landmarks_list = detection_result.hand_landmarks
+                # handedness_list = detection_result.handedness
+                # coordinates = {}
+
+                # take the first hand
+                hand_landmarks = detection_result.hand_landmarks[0]
+                handedness = detection_result.handedness[0][0].display_name # it's not useful for our case
+                hand_score = detection_result.handedness[0][0].score 
+
+                if hand_score < target_score:
+                    print(f"Hand detected, but with not enough score --> {hand_score} / {target_score}")
+                    return False
+
+                # for i, landmark in enumerate(hand_landmarks):
+                self.HAND_KNUCKLES_COORDINATES = [(landmark.x, landmark.y, landmark.z) for landmark in hand_landmarks]
+                return True
+                # for idx in range(len(hand_landmarks_list)):
+                #     hand_landmarks = hand_landmarks_list[idx]
+                #     handedness = handedness_list[idx][0].display_name
+                #     hand_score = handedness_list[idx][0].score
+                #     if hand_score < target_score:
+                #         continue
+                #     coordinates[handedness] = {}
+                #     for i, landmarks in enumerate(hand_landmarks):
+                #         coordinates[handedness][self.HAND_KNUCKLES[i]] = (landmarks.x, landmarks.y, landmarks.z)
+                # return coordinates
 
         except AttributeError as e:
             print(f"ERROR - {e}")
@@ -145,19 +160,19 @@ class HandTracker:
                     hand_score = handedness_list[idx][0].score
                     if hand_score > 0.97:
                         print(handedness)
-                        print(f'{self.HAND_KNUCKLE[0]} - x:{hand_landmarks[0].x} | y:{hand_landmarks[0].y}')
-                        print(f'{self.HAND_KNUCKLE[4]} - x:{hand_landmarks[4].x} | y:{hand_landmarks[4].y}')
-                        print(f'{self.HAND_KNUCKLE[8]} - x:{hand_landmarks[8].x} | y:{hand_landmarks[8].y}')
-                        print(f'{self.HAND_KNUCKLE[12]} - x:{hand_landmarks[12].x} | y:{hand_landmarks[12].y}')
-                        print(f'{self.HAND_KNUCKLE[16]} - x:{hand_landmarks[16].x} | y:{hand_landmarks[16].y}')
-                        print(f'{self.HAND_KNUCKLE[20]} - x:{hand_landmarks[20].x} | y:{hand_landmarks[20].y}')
+                        print(f'{self.HAND_KNUCKLES[0]} - x:{hand_landmarks[0].x} | y:{hand_landmarks[0].y}')
+                        print(f'{self.HAND_KNUCKLES[4]} - x:{hand_landmarks[4].x} | y:{hand_landmarks[4].y}')
+                        print(f'{self.HAND_KNUCKLES[8]} - x:{hand_landmarks[8].x} | y:{hand_landmarks[8].y}')
+                        print(f'{self.HAND_KNUCKLES[12]} - x:{hand_landmarks[12].x} | y:{hand_landmarks[12].y}')
+                        print(f'{self.HAND_KNUCKLES[16]} - x:{hand_landmarks[16].x} | y:{hand_landmarks[16].y}')
+                        print(f'{self.HAND_KNUCKLES[20]} - x:{hand_landmarks[20].x} | y:{hand_landmarks[20].y}')
                     # print(f'Handedness: {handedness[0].display_name} [{handedness[0].score:.4f}]\n') # take the hands which the score is more than 0.99
                     # index_finger = hand_landmarks[9]
                     # print(f'{index_finger.x}\n{index_finger.y}\n{index_finger.z}')
                     
                     # for i, knuckles in enumerate(hand_landmarks):
                     #     print(10*'-')
-                    #     print(f'{self.HAND_KNUCKLE[i]} : {knuckles}')
+                    #     print(f'{self.HAND_KNUCKLES[i]} : {knuckles}')
                     # print(10*'-')
                 print(20*"=")
         except:
