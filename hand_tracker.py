@@ -60,6 +60,11 @@ class HandTracker:
     def get_results(self) -> vision.HandLandmarkerResult:
         return self.results
 
+    def is_finger_extended(self, hand) -> bool:
+        return False
+
+    # TODO - check if this fuction is useful
+    # ABANDONED
     def get_knuckle_coordinates(self, region:str|int, target_score:float=0.98) -> Optional[Tuple[float, float, float]]:
         detection_result = self.get_results()
         try:
@@ -125,6 +130,7 @@ class HandTracker:
             return None
 
 
+    # TODO - Fix this one - just print all the value and hand_score should be class parameter
     def print_positions(self, detection_result: vision.HandLandmarkerResult) -> None:
         try:
             if detection_result.hand_landmarks == []:
@@ -157,7 +163,14 @@ class HandTracker:
         except:
             return None
 
+    # TODO - Finish comments
     def draw_landmarks_on_image(self, rgb_image):
+        '''
+        Docstring for draw_landmarks_on_image
+        
+        :param self: Description
+        :param rgb_image: Description
+        '''
         detection_result = self.get_results()
         try:
             if detection_result.hand_landmarks == []:
