@@ -34,7 +34,7 @@ class HandControlApp:
             
             # print(f'\n\n{results}\n\n{len(results)}\n\n')
 
-            final_frame = self.detector.draw_landmarks_on_image(frame)
+            # final_frame = self.detector.draw_landmarks_on_image(frame)
 
             # self.detector.print_positions(results)
             # print(self.detector.get_all_knuckle_coordinates(results))
@@ -52,7 +52,7 @@ class HandControlApp:
             # final_frame = cv.cvtColor(frame_with_draw, cv.COLOR_RGB2BGR)
             
 
-            cv.imshow("Camera", final_frame)
+            # cv.imshow("Camera", final_frame)
 
             if cv.waitKey(1) != -1:
                 break
