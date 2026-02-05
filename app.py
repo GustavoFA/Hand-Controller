@@ -13,7 +13,7 @@ class HandControlApp:
         self.controller = ComputerInputController()
 
     def run(self):
-        
+        run_time = 0
         while True:
             ret, frame = self.camera.read()
             if not ret:
@@ -25,12 +25,25 @@ class HandControlApp:
 
             # results = self.detector.get_results()
 
-            try:
-                x, y, _ = self.detector.get_knuckle_coordinates(8)
-                # self.controller.smooth_move(x, y)
-                self.controller.straight_move(x, y)
-            except TypeError as e:
-                print(e)
+            # try:
+            #     x, y, _ = self.detector.get_knuckle_coordinates(8)
+            #     # self.controller.smooth_move(x, y)
+            #     self.controller.straight_move(x, y)
+            # except TypeError as e:
+            #     print(e)
+
+            if self.detector.update_knuckles_coordinates() and (time.time() - run_time > 1.0):
+                run_time = time.time()
+                # INDEX_F = self.detector.HAND_KNUCKLES_COORDINATES[5:9]
+                # THUMB_F = self.detector.HAND_KNUCKLES_COORDINATES[1:5]
+                # # print("\nCOORDINATES:")
+                # # # print(INDEX_F)
+                # print('\n')
+                # for pos in THUMB_F:
+                #     print(pos)
+                for key in self.detector.FINGER_INDEX.keys():
+                    if self.detector.is_finger_extended(key):
+                        print(key)
             
             # print(f'\n\n{results}\n\n{len(results)}\n\n')
 
