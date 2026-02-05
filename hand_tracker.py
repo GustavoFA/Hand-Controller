@@ -20,6 +20,13 @@ class HandTracker:
     HAND_KNUCKLES = ['WRIST', 'THUMB_CMC', 'THUMB_MCP', 'THUMB_IP', 'THUMB_TIP', 'INDEX_FINGER_MCP', 'INDEX_FINGER_PIP', 'INDEX_FINGER_DIP',
                     'INDEX_FINGER_TIP', 'MIDDLE_FINGER_MCP', 'MIDDLE_FINGER_PIP', 'MIDDLE_FINGER_DIP', 'MIDDLE_FINGER_TIP', 'RING_FINGER_MCP',
                     'RING_FINGER_PIP', 'RING_FINGER_DIP', 'RING_FINGER_TIP', 'PINKY_MCP', 'PINKY_PIP', 'PINKY_DIP', 'PINKY_TIP']
+    FINGER_INDEX = {
+        'thumb': (3, 4),
+        'index': (5, 8),
+        'middle': (9, 12),
+        'ring': (13, 16),
+        'pinky': (17, 20)
+    }
     HAND_KNUCKLES_COORDINATES = []
 
     def __init__(self, model_path:str="hand_landmarker.task", num_hands:int=1):
@@ -61,8 +68,15 @@ class HandTracker:
     def get_results(self) -> vision.HandLandmarkerResult:
         return self.results
 
-    def is_finger_extended(self, hand) -> bool:
-        return False
+    def is_finger_extended(self, finger:str) -> bool:
+        finger = finger.lower()
+        if len(self.HAND_KNUCKLES_COORDINATES ) < 21:
+            print("Couldn't find the knuckles coordinates")
+            return False
+        if finger not in self.FINGER_INDEX.keys():
+            print(f"Finger name unavailable - Possible names : {list(self.FINGER_INDEX.keys())}")
+            return False
+        return True if self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][1]][1] < self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][0]][1] else False
 
     # TODO - check if this fuction is useful
     # ABANDONED
@@ -106,7 +120,7 @@ class HandTracker:
 
     # TODO:
         # just take the first hand 
-    def update_knuckles_coordinates(self, target_score:float=0.98, n_hands:int=1) -> bool:
+    def update_knuckles_coordinates(self, target_score:float=0.98) -> bool:
         detection_result = self.get_results()
         try:
             if not detection_result.hand_landmarks:
@@ -123,7 +137,7 @@ class HandTracker:
                 hand_score = detection_result.handedness[0][0].score 
 
                 if hand_score < target_score:
-                    print(f"Hand detected, but with not enough score --> {hand_score} / {target_score}")
+                    print(f"Hand {handedness} detected, but with not enough score --> {hand_score} / {target_score}")
                     return False
 
                 # for i, landmark in enumerate(hand_landmarks):
@@ -142,7 +156,7 @@ class HandTracker:
 
         except AttributeError as e:
             print(f"ERROR - {e}")
-            return None
+            return False
 
 
     # TODO - Fix this one - just print all the value and hand_score should be class parameter
