@@ -21,7 +21,7 @@ class HandTracker:
                     'INDEX_FINGER_TIP', 'MIDDLE_FINGER_MCP', 'MIDDLE_FINGER_PIP', 'MIDDLE_FINGER_DIP', 'MIDDLE_FINGER_TIP', 'RING_FINGER_MCP',
                     'RING_FINGER_PIP', 'RING_FINGER_DIP', 'RING_FINGER_TIP', 'PINKY_MCP', 'PINKY_PIP', 'PINKY_DIP', 'PINKY_TIP']
     FINGER_INDEX = {
-        'thumb': (3, 4),
+        'thumb': (4, 3),
         'index': (5, 8),
         'middle': (9, 12),
         'ring': (13, 16),
@@ -68,6 +68,7 @@ class HandTracker:
     def get_results(self) -> vision.HandLandmarkerResult:
         return self.results
 
+    # TODO - this function works with the palm, but back of the hand doesn't work
     def is_finger_extended(self, finger:str) -> bool:
         finger = finger.lower()
         if len(self.HAND_KNUCKLES_COORDINATES ) < 21:
@@ -76,7 +77,12 @@ class HandTracker:
         if finger not in self.FINGER_INDEX.keys():
             print(f"Finger name unavailable - Possible names : {list(self.FINGER_INDEX.keys())}")
             return False
-        return True if self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][1]][1] < self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][0]][1] else False
+        # for thumb we should use the X axis and for other fingers the Y axis
+        if finger == 'thumb':
+            axis = 0 # X
+        else:
+            axis = 1 # Y
+        return True if self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][1]][axis] < self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][0]][axis] else False
 
     # TODO - check if this fuction is useful
     # ABANDONED
