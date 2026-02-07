@@ -34,13 +34,16 @@ class HandControlApp:
 
             if self.detector.update_knuckles_coordinates() and (time.time() - run_time > 1.0):
                 run_time = time.time()
+
                 # INDEX_F = self.detector.HAND_KNUCKLES_COORDINATES[5:9]
-                # THUMB_F = self.detector.HAND_KNUCKLES_COORDINATES[1:5]
                 # # print("\nCOORDINATES:")
                 # # # print(INDEX_F)
-                # print('\n')
+
+                # THUMB_F = self.detector.HAND_KNUCKLES_COORDINATES[1:5]
+                # print('\n-----')
                 # for pos in THUMB_F:
                 #     print(pos)
+
                 for key in self.detector.FINGER_INDEX.keys():
                     if self.detector.is_finger_extended(key):
                         print(key)
@@ -65,7 +68,7 @@ class HandControlApp:
             # final_frame = cv.cvtColor(frame_with_draw, cv.COLOR_RGB2BGR)
             
 
-            # cv.imshow("Camera", final_frame)
+            cv.imshow("Camera", frame)
 
             if cv.waitKey(1) != -1:
                 break
