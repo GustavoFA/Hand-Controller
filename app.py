@@ -4,6 +4,7 @@ import pyautogui
 from camera import Camera
 from hand_tracker import HandTracker
 from controller import ComputerInputController
+from self_segmentation import SelfSegmentationTools
 
 class HandControlApp:
 
@@ -11,8 +12,38 @@ class HandControlApp:
         self.camera = Camera()
         self.detector = HandTracker(num_hands=2)
         self.controller = ComputerInputController()
+        # self.segmenter_tool = SelfSegmentationTools()
 
-    def run(self):
+    def run_controller_for_game(self, minimum_hand_score:float=0.5, debounce:float=0.3):
+        commands = {
+            'index': 'space',
+            'thumb': 'd',
+            'pinky': 'a',
+            'middle': 'w'
+        }
+
+        input('Press ENTER to start the controller:\n')
+        last_time = time.time()
+        while True:
+            ret, frame = self.camera.read()
+            if not ret:
+                print('Failed to read frame')
+                break
+            
+            self.detector._detect_async(frame)
+            if self.detector.update_knuckles_coordinates(minimum_hand_score, verbose=False) and (time.time() - last_time > debounce):
+                keys_status = {}
+                for finger, button in commands.items():
+                    if self.detector.is_finger_extended(finger):
+                        keys_status[button] = True
+                    else:
+                        keys_status[button] = False
+                self.controller.controller_buttons(keys_status)
+                last_time = time.time()
+        self.cleanup()
+
+    def run_test(self):
+
         run_time = 0
         while True:
             ret, frame = self.camera.read()
@@ -20,6 +51,10 @@ class HandControlApp:
                 print("Failed to read frame")
                 break
             
+            # frame = self.camera.depth_like_filter(frame)
+            # frame = self.camera.skin_mask(frame)
+            # frame = self.segmenter_tool.segment_foreground(frame)
+
             # update the hand position
             self.detector.detect_async(frame)
 
@@ -32,8 +67,10 @@ class HandControlApp:
             # except TypeError as e:
             #     print(e)
 
-            if self.detector.update_knuckles_coordinates() and (time.time() - run_time > 1.0):
+            if self.detector.update_knuckles_coordinates(0.5) and (time.time() - run_time > 1.0):
                 run_time = time.time()
+
+                print(self.detector.HAND_KNUCKLES_COORDINATES[0])
 
                 # INDEX_F = self.detector.HAND_KNUCKLES_COORDINATES[5:9]
                 # # print("\nCOORDINATES:")
@@ -44,9 +81,11 @@ class HandControlApp:
                 # for pos in THUMB_F:
                 #     print(pos)
 
-                for key in self.detector.FINGER_INDEX.keys():
-                    if self.detector.is_finger_extended(key):
-                        print(key)
+                # To identify 
+                print(10*'-')
+                # for key in self.detector.FINGER_INDEX.keys():
+                #     if self.detector.is_finger_extended(key):
+                #         print(key)
             
             # print(f'\n\n{results}\n\n{len(results)}\n\n')
 
@@ -64,7 +103,7 @@ class HandControlApp:
             #     mp_image.numpy_view(),
             #     detection_result
             # )
-
+# 
             # final_frame = cv.cvtColor(frame_with_draw, cv.COLOR_RGB2BGR)
             
 

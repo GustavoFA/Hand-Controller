@@ -10,12 +10,24 @@ class ComputerInputController:
         self.prev_x, self.prev_y = pyautogui.position()
         self.alpha = alpha
 
+    @staticmethod
+    def controller_buttons(commands:dict) -> None:
+        for key, status in commands.items():
+            if status:
+                pyautogui.keyDown(key)
+            else:
+                pyautogui.keyUp(key)
+
+
     def straight_move(self, x, y):
         x = int(x * self.screen_w)
         y = int(y * self.screen_h)
         pyautogui.moveTo(x, y)
 
     def smooth_move(self, x, y):
+        '''
+        Exponential moving average (EMA)
+        '''
         if self.prev_x is None:
             self.prev_x, self.prev_y = x, y
 

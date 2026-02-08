@@ -47,6 +47,7 @@ class Camera:
 
         return result
     
+    # TODO - terrible
     def skin_mask(self, frame) -> np.ndarray:
         ycrcb = cv.cvtColor(frame, cv.COLOR_BGR2YCrCb)
 
