@@ -51,6 +51,8 @@ class HandTracker:
         # handlandmarks result
         self.results = vision.HandLandmarkerResult
 
+        self._timestamp_ms = 0
+
     @staticmethod
     def _distance_2d(a, b) -> float:
         return math.hypot(a.x - b.x, a.y - b.y)
@@ -61,16 +63,19 @@ class HandTracker:
     def get_results(self) -> vision.HandLandmarkerResult:
         return self.results
 
-    def detect_async(self, frame):
+    def _detect_async(self, frame):
         rgb_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
         mp_image = Image(
-            image_format=mp.ImageFormat.SRGB,
+            image_format=ImageFormat.SRGB,
             data=rgb_frame
         )
 
+        self._timestamp_ms += 1 # guaranteed monotonic
+
         self.detector.detect_async(image=mp_image,
-                                   timestamp_ms=int(time.time()*1000)
+                                   timestamp_ms=self._timestamp_ms
+                                #    timestamp_ms=int(time.time()*1000)
         )
 
     # TODO - 
@@ -151,17 +156,13 @@ class HandTracker:
 
     # TODO:
         # just take the first hand 
-    def update_knuckles_coordinates(self, target_score:float=0.98) -> bool:
+    def update_knuckles_coordinates(self, target_score:float=0.98, verbose:bool=True) -> bool:
         detection_result = self.get_results()
         try:
             if not detection_result.hand_landmarks:
-                print("Couldn't find any hand landmark")
+                if verbose: print("Couldn't find any hand landmark")
                 return False
-            else:
-                # hand_landmarks_list = detection_result.hand_landmarks
-                # handedness_list = detection_result.handedness
-                # coordinates = {}
-
+            else: 
                 # take the first hand
                 hand_landmarks = detection_result.hand_landmarks[0]
                 handedness = detection_result.handedness[0][0].display_name # it's not useful for our case
@@ -171,19 +172,8 @@ class HandTracker:
                     print(f"Hand {handedness} detected, but with not enough score --> {hand_score} / {target_score}")
                     return False
 
-                # for i, landmark in enumerate(hand_landmarks):
                 self.HAND_KNUCKLES_COORDINATES = [(landmark.x, landmark.y, landmark.z) for landmark in hand_landmarks]
                 return True
-                # for idx in range(len(hand_landmarks_list)):
-                #     hand_landmarks = hand_landmarks_list[idx]
-                #     handedness = handedness_list[idx][0].display_name
-                #     hand_score = handedness_list[idx][0].score
-                #     if hand_score < target_score:
-                #         continue
-                #     coordinates[handedness] = {}
-                #     for i, landmarks in enumerate(hand_landmarks):
-                #         coordinates[handedness][self.HAND_KNUCKLES[i]] = (landmarks.x, landmarks.y, landmarks.z)
-                # return coordinates
 
         except AttributeError as e:
             print(f"ERROR - {e}")
