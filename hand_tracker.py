@@ -1,4 +1,5 @@
 import time
+import math
 import cv2 as cv
 import numpy as np
 import mediapipe as mp
@@ -50,8 +51,15 @@ class HandTracker:
         # handlandmarks result
         self.results = vision.HandLandmarkerResult
 
+    @staticmethod
+    def _distance_2d(a, b) -> float:
+        return math.hypot(a.x - b.x, a.y - b.y)
+    
     def update_results(self, result: vision.HandLandmarkerResult, output_image: Image, timestamp: int):
         self.results = result
+
+    def get_results(self) -> vision.HandLandmarkerResult:
+        return self.results
 
     def detect_async(self, frame):
         rgb_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
@@ -65,8 +73,24 @@ class HandTracker:
                                    timestamp_ms=int(time.time()*1000)
         )
 
-    def get_results(self) -> vision.HandLandmarkerResult:
-        return self.results
+    # TODO - 
+    def is_tweezers(self, threshold:float, target_score:float=0.98) -> bool:
+        result = self.get_results()
+
+        if not result or not result.hand_landmarks:
+            return False
+        
+        # Take the first hand
+        if result.handedness[0][0].score < target_score:
+            return False
+        
+        landmarks = result.hand_landmarks[0]
+
+        # 4 represents thumb tip and 8 represents index finger tip
+        distance = self._distance_2d(landmarks[4], landmarks[8])
+        print(distance)
+
+        return distance < threshold
 
     # TODO - this function works with the palm, but back of the hand doesn't work
     def is_finger_extended(self, finger:str) -> bool:
@@ -83,6 +107,7 @@ class HandTracker:
         else:
             axis = 1 # Y
         return True if self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][1]][axis] < self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][0]][axis] else False
+
 
     # TODO - check if this fuction is useful
     # ABANDONED
