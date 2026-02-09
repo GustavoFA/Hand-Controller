@@ -105,15 +105,16 @@ class HandTracker:
             image_format=ImageFormat.SRGB,
             data=rgb_frame
         )
+        self._timestamp_ms += 1
         if self.mode == 'live_stream':
-            self._timestamp_ms += 1
             self.detector.detect_async(
                 image=mp_image,
                 timestamp_ms=self._timestamp_ms
             )
             return self.results
         else:
-            self.results = self.detector.detect(mp_image)
+            # self.results = self.detector.detect(mp_image)
+            self.results = self.detector.detect_for_video(mp_image, self._timestamp_ms)
             return self.results
 
     # TODO - 
