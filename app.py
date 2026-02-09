@@ -10,11 +10,14 @@ class HandControlApp:
 
     def __init__(self):
         self.camera = Camera()
-        self.detector = HandTracker(mode='video', num_hands=1)
+        self.detector = HandTracker(mode='video', num_hands=1,
+                                    min_hand_detection_confidence=0.5, # lower precision -> faster tracking
+                                    min_hand_presence_confidence=0.5,
+                                    min_tracking_confidence=0.5)
         self.controller = ComputerInputController()
         # self.segmenter_tool = SelfSegmentationTools() # to be explored
 
-    def run_controller_for_game(self, minimum_hand_score:float=0.5, debounce:float=0.0001):
+    def run_controller_for_game(self, minimum_hand_score:float=0.5, skip_frame:bool=True):
         commands = {
             'index': 'space',
             'thumb': 'd',
@@ -23,15 +26,16 @@ class HandControlApp:
         }
         key_states = {finger: False for finger in commands}
         input('Press ENTER to start the controller:\n')
-        last_time = time.time()
+        frame_count = 0
         while True:
             ret, frame = self.camera.read()
+            frame_count += 1
             if not ret:
                 print('Failed to read frame')
                 break
             self.detector.get_results(frame)
 
-            if not self.detector.update_knuckles_coordinates(minimum_hand_score, verbose=False):
+            if not self.detector.update_knuckles_coordinates(minimum_hand_score, verbose=False) or (skip_frame and frame_count % 2 != 0):
                 continue
 
             for finger, key in commands.items():
