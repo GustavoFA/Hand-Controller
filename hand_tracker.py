@@ -80,23 +80,41 @@ class HandTracker:
     def update_results(self, result: vision.HandLandmarkerResult, output_image: Image, timestamp: int):
         self.results = result
 
-    def get_results(self) -> vision.HandLandmarkerResult:
-        return self.results
+    # # Old - but it's working
+    # def get_results(self) -> vision.HandLandmarkerResult:
+    #     return self.results
+    # def _detect_async(self, frame):
+    #     rgb_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
-    def _detect_async(self, frame):
+    #     mp_image = Image(
+    #         image_format=ImageFormat.SRGB,
+    #         data=rgb_frame
+    #     )
+
+    #     self._timestamp_ms += 1 # guaranteed monotonic
+
+    #     self.detector.detect_async(image=mp_image,
+    #                                timestamp_ms=self._timestamp_ms
+    #                             #    timestamp_ms=int(time.time()*1000)
+    #     )
+
+    # new function - union get_results with _detect_async
+    def get_results(self, frame:np.ndarray) -> vision.HandLandmarkerResult:
         rgb_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
-
         mp_image = Image(
             image_format=ImageFormat.SRGB,
             data=rgb_frame
         )
-
-        self._timestamp_ms += 1 # guaranteed monotonic
-
-        self.detector.detect_async(image=mp_image,
-                                   timestamp_ms=self._timestamp_ms
-                                #    timestamp_ms=int(time.time()*1000)
-        )
+        if self.mode == 'live_stream':
+            self._timestamp_ms += 1
+            self.detector.detect_async(
+                image=mp_image,
+                timestamp_ms=self._timestamp_ms
+            )
+            return self.results
+        else:
+            self.results = self.detector.detect(mp_image)
+            return self.results
 
     # TODO - 
     def is_tweezers(self, threshold:float, target_score:float=0.98) -> bool:
