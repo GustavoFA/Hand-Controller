@@ -5,6 +5,10 @@ Tool to identify and track hand movement and positions : [MediaPipe](https://chu
 
 You can find the hand landmarker file on this [link](https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task)
 
+
+
+---
+
 Hand command positions:
 
 * Finger pointing - move the mouse.
@@ -13,7 +17,13 @@ Hand command positions:
 * Loser hand - left mouse button (LMB) click.
 * Closed hand - neutral position (do nothing).
 
+---
 
 To get more information about:
 
+* [Hand landmark detection](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker)
 * [Segmenter](https://ai.google.dev/edge/mediapipe/solutions/vision/image_segmenter)
+
+### Project status
+
+The hand detection and the commands are working, but there's a lot of latency between each command. I don't know where is the core of the problem is.

@@ -30,17 +30,37 @@ class HandTracker:
     }
     HAND_KNUCKLES_COORDINATES = []
 
-    def __init__(self, model_path:str="hand_landmarker.task", num_hands:int=1):
+    def __init__(self, model_path:str="hand_landmarker.task", 
+                 mode:str="live_stream", 
+                 num_hands:int=1,
+                 min_hand_detection_confidence:float=0.2,
+                 min_hand_presence_confidence:float=0.2,
+                 min_tracking_confidence:float=0.2
+                 ):
         # creating the handlandmarker objetct
         base_options = python.BaseOptions(model_asset_path=model_path)
-        options = vision.HandLandmarkerOptions(base_options=base_options,
-                                            running_mode=vision.RunningMode.LIVE_STREAM,
-                                            num_hands=num_hands,
-                                            min_hand_detection_confidence=0.3,
-                                            min_hand_presence_confidence=0.3,
-                                            min_tracking_confidence=0.3,
-                                            result_callback=self.update_results, 
-                                            )
+        # selecting the mode of hand landmark
+        self.mode = mode.lower()
+        if self.mode == "live_stream":
+            options = vision.HandLandmarkerOptions(base_options=base_options,
+                                                running_mode=vision.RunningMode.LIVE_STREAM,
+                                                num_hands=num_hands,
+                                                min_hand_detection_confidence=min_hand_detection_confidence,
+                                                min_hand_presence_confidence=min_hand_presence_confidence,
+                                                min_tracking_confidence=min_tracking_confidence,
+                                                result_callback=self.update_results, 
+                                                )
+        elif self.mode == "video":
+            options = vision.HandLandmarkerOptions(base_options=base_options,
+                                                   running_mode=vision.RunningMode.VIDEO,
+                                                   num_hands=num_hands,
+                                                    min_hand_detection_confidence=min_hand_detection_confidence,
+                                                    min_hand_presence_confidence=min_hand_presence_confidence,
+                                                    min_tracking_confidence=min_tracking_confidence
+                                                    )
+        else:
+            raise ValueError("Mode not available. The options are: live_stream and video.")
+
         self.detector = vision.HandLandmarker.create_from_options(options) 
 
         # visualization utilities
