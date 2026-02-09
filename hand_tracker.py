@@ -98,7 +98,7 @@ class HandTracker:
     #                             #    timestamp_ms=int(time.time()*1000)
     #     )
 
-    # new function - union get_results with _detect_async
+    # new function that combines get_results and _detect_async
     def get_results(self, frame:np.ndarray) -> vision.HandLandmarkerResult:
         rgb_frame = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
         mp_image = Image(
@@ -118,16 +118,16 @@ class HandTracker:
 
     # TODO - 
     def is_tweezers(self, threshold:float, target_score:float=0.98) -> bool:
-        result = self.get_results()
+        # result = self.get_results()
 
-        if not result or not result.hand_landmarks:
+        if not self.results or not self.results.hand_landmarks:
             return False
         
         # Take the first hand
-        if result.handedness[0][0].score < target_score:
+        if self.results.handedness[0][0].score < target_score:
             return False
         
-        landmarks = result.hand_landmarks[0]
+        landmarks = self.results.hand_landmarks[0]
 
         # 4 represents thumb tip and 8 represents index finger tip
         distance = self._distance_2d(landmarks[4], landmarks[8])
@@ -155,9 +155,9 @@ class HandTracker:
     # TODO - check if this fuction is useful
     # ABANDONED
     def get_knuckle_coordinates(self, region:str|int, target_score:float=0.98) -> Optional[Tuple[float, float, float]]:
-        detection_result = self.get_results()
+        # detection_result = self.get_results()
         try:
-            if not detection_result or not detection_result.hand_landmarks:
+            if not self.result or not self.result.hand_landmarks:
                 print("Couldn't find any hand landmark result")
                 return None
             else:
@@ -178,8 +178,8 @@ class HandTracker:
                     print("Region not accepeted")
                     return None
 
-                hand_landmarks_list = detection_result.hand_landmarks
-                handedness_list = detection_result.handedness
+                hand_landmarks_list = self.result.hand_landmarks
+                handedness_list = self.result.handedness
 
                 # get just the first hand detected
                 if handedness_list[0][0].score < target_score:
@@ -195,16 +195,16 @@ class HandTracker:
     # TODO:
         # just take the first hand 
     def update_knuckles_coordinates(self, target_score:float=0.98, verbose:bool=True) -> bool:
-        detection_result = self.get_results()
+        # detection_result = self.get_results()
         try:
-            if not detection_result.hand_landmarks:
+            if not self.results.hand_landmarks:
                 if verbose: print("Couldn't find any hand landmark")
                 return False
             else: 
                 # take the first hand
-                hand_landmarks = detection_result.hand_landmarks[0]
-                handedness = detection_result.handedness[0][0].display_name # it's not useful for our case
-                hand_score = detection_result.handedness[0][0].score 
+                hand_landmarks = self.results.hand_landmarks[0]
+                handedness = self.results.handedness[0][0].display_name # it's not useful for our case
+                hand_score = self.results.handedness[0][0].score 
 
                 if hand_score < target_score:
                     print(f"Hand {handedness} detected, but with not enough score --> {hand_score} / {target_score}")
@@ -259,13 +259,13 @@ class HandTracker:
         :param self: Description
         :param rgb_image: Description
         '''
-        detection_result = self.get_results()
+        # detection_result = self.get_results()
         try:
-            if detection_result.hand_landmarks == []:
+            if self.results.hand_landmarks == []:
                 return rgb_image
             else:
-                hand_landmarks_list = detection_result.hand_landmarks
-                handedness_list = detection_result.handedness
+                hand_landmarks_list = self.results.hand_landmarks
+                handedness_list = self.results.handedness
                 annotated_image = np.copy(rgb_image)
 
                 # Loop through the detected hands to visualize.
