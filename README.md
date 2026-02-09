@@ -1,3 +1,5 @@
+# Hand Controller
+
 Projects focusing on computer vision using hands to command computer.
 
 Tool to identify and track hand movement and positions : [MediaPipe](https://chuoling.github.io/mediapipe/)
@@ -26,4 +28,4 @@ To get more information about:
 
 ### Project status
 
-The hand detection and the commands are working, but there's a lot of latency between each command. I don't know where is the core of the problem is.
+The hand detection and the commands are working, but there's a lot of latency between each command. I don't know where the core of the problem is. After changing the hand detection mode, we saw that the issue is not related to hand capture. This was fixed by reducing OS calls and enabling some features. Another way to reduce latency is by using `pynput`, `evdev` (Linux) or `virtual gamepad` (vgamepad).

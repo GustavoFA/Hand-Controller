@@ -5,6 +5,7 @@ class ComputerInputController:
     def __init__(self, alpha:float=0.2):
 
         pyautogui.FAILSAFE = False
+        pyautogui.PAUSE = 0 # reduce latency
         
         self.screen_w, self.screen_h = pyautogui.size()
         self.prev_x, self.prev_y = pyautogui.position()
