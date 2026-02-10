@@ -1,35 +1,71 @@
 # Hand Controller
 
-Projects focusing on computer vision using hands to command computer.
+A computer vision project that uses hand gestures to control the mouse and keyboard in real time.
 
-Tool to identify and track hand movement and positions : [MediaPipe](https://ai.google.dev/edge/mediapipe/solutions/guide)
+This project leverages MediaPipe Hand Landmarker to detect and track hand landmarks from a camera feed, mapping specific hand poses to system input commands (mouse movement and clicks).
+
+## Features
+- Real-time hand landmark detection using MediaPipe
+- Gesture-based mouse control
+- Configurable gesture → command mapping
+- Modular design (camera, hand tracking, input controller)
+
+## Gesture Commands
+
+| Gesture                          | Controller action                  |
+| -------------------------------- | ---------------------------------- |
+| Index finger extended            | Space                              |
+| Middle finger extended           | W                                  |
+| Pinky finger extended            | A                                  |
+| Thumb finger extended            | D                                  |
+| Closed hand                      | Neutral state (no action)          |
+
+## Requirements
+
+- Python version >= 3.10 (Tested with 3.12.3)
+- MediaPipe – hand landmark detection
+- OpenCV – camera input & image processing
+- PyAutoGUI – mouse and keyboard control
+- NumPy
+
+## Model File
+You need the MediaPipe Hand Landmarker model. Download it in the link below and place the file in your project root (or update the path in the code).
+
+https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task
+
+## Getting Started
+
+```
+git clone https://github.com/GustavoFA/Hand-Controller.git
+cd Hand-Controller
+python -m venv .venv
+source .venv/bin/activate  # Linux/macOS
+pip install -r requirements.txt
+python main.py
+```
+Make sure your webcam is connected and accessible.
+
+## Project Status
+
+### Future Improvements
+
+- Add gesture smoothing and debouncing
+- Support multiple hands
+- Use the computer without a mouse and keyboard
+
+### Issues fixed
+
+- Highly latency : The keyboard commands have a lot of latency between each comand. The main bottleneck appears to be OS-level input calls. This was fixed by reducing OS calls and disable unnecessary PyAutoGUI delays. Another way to reduce latency is by using other libraries, like `pynput`, `evdev` (Linux) or `virtual gamepad` (vgamepad).
+
+### Issues
+
+- Hand mouse movement is jittery
+
+## References
+- [MediaPipe](https://ai.google.dev/edge/mediapipe/solutions/guide)
+- [Hand landmark detection](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker)
+- [Segmenter](https://ai.google.dev/edge/mediapipe/solutions/vision/image_segmenter)
 
 
-You can find the hand landmarker file on this [link](https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task)
-
-
-
----
-
-Hand command positions:
-
-* Finger pointing - move the mouse.
-* Tweezers by hand - holding left mouse button (LMB).
-* Pinky pointing - right mouse button (RMB) click.
-* Loser hand - left mouse button (LMB) click.
-* Closed hand - neutral position (do nothing).
-
----
-
-To get more information about:
-
-* [Hand landmark detection](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker)
-* [Segmenter](https://ai.google.dev/edge/mediapipe/solutions/vision/image_segmenter)
-
-### Requirements
-
-- Python version >= 3.10 (In this project I use version 3.12.3)
-
-### Project status
-
-The hand detection and the commands are working, but there's a lot of latency between each command. I don't know where the core of the problem is. After changing the hand detection mode, we saw that the issue is not related to hand capture. This was fixed by reducing OS calls and enabling some features. Another way to reduce latency is by using `pynput`, `evdev` (Linux) or `virtual gamepad` (vgamepad).
+## License
+This project is licensed under the MIT License — see the `LICENSE` file for details.
