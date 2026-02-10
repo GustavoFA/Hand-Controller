@@ -2,7 +2,7 @@
 
 Projects focusing on computer vision using hands to command computer.
 
-Tool to identify and track hand movement and positions : [MediaPipe](https://chuoling.github.io/mediapipe/)
+Tool to identify and track hand movement and positions : [MediaPipe](https://ai.google.dev/edge/mediapipe/solutions/guide)
 
 
 You can find the hand landmarker file on this [link](https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task)
@@ -25,6 +25,10 @@ To get more information about:
 
 * [Hand landmark detection](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker)
 * [Segmenter](https://ai.google.dev/edge/mediapipe/solutions/vision/image_segmenter)
+
+### Requirements
+
+- Python version >= 3.10 (In this project I use version 3.12.3)
 
 ### Project status
 
