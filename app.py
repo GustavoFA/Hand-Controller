@@ -7,6 +7,12 @@ from controller import ComputerInputController
 from self_segmentation import SelfSegmentationTools
 
 class HandControlApp:
+    """
+    A collection of control forms:
+    - joystick
+    - keyboard
+    - hand mouse
+    """
 
     def __init__(self):
         self.camera = Camera()
