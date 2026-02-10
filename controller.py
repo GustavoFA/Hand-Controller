@@ -13,7 +13,7 @@ class ComputerInputController:
         - Map hand gestures or tracking finger coordinates to OS-level inputs.
     """
 
-    def __init__(self, alpha:float=0.2):
+    def __init__(self, alpha:float=0.3):
         """
         Init the input controller.
 
@@ -21,6 +21,9 @@ class ComputerInputController:
             alpha (float): Smoothing factor for mouse movement.
                            Range: (0, 1]
                            Lower values = smoother but slower response.
+                            alpha=0.1  # smooth
+                            alpha=0.3  # balanced
+                            alpha=0.6  # fast
         
         """
         # Disable PyAutoGUI failsafe to prevent exceptions when cursor hits screen corners
@@ -35,7 +38,7 @@ class ComputerInputController:
         self.alpha = alpha
 
     @staticmethod
-    def controller_buttons(commands:dict) -> None:
+    def controller_buttons(commands:dict[str, bool]) -> None:
         """
         Press or release keyboard keys based on a command dictionary.
 
