@@ -75,6 +75,8 @@ class HandControlApp:
             if self.detector.is_finger_extended('index', 0.22):
                 x, y, _ = self.detector.HAND_KNUCKLES_COORDINATES[8]
                 self.controller.smooth_move(x, y)
+            elif self.detector.is_two_finger_extended(['index', 'middle'], 0.2):
+                x, y, _ = self.detector.HAND_KNUCKLES_COORDINATES[12]
 
             pinched = self.detector.is_tweezers(0.04)
             if pinched and not lmb_pressed:
@@ -83,9 +85,46 @@ class HandControlApp:
             elif not pinched and lmb_pressed:
                 pyautogui.mouseUp(button='left')
                 lmb_pressed = False
+            
+            # RMB
+            if self.detector.is_finger_extended('pinky', 0.1):
+                pass
+            
+            # Scroll movement
+            if self.detector.is_two_finger_extended(['index', 'middle'], 0.1):
+                pass
 
         self.cleanup()
 
+    def run_debugging(self) -> None:
+        
+        while True:
+            ret, frame = self.camera.read()
+            if not ret:
+                print("Failed to read frame")
+                break
+            self.detector.get_results(frame)
+
+            cv.imshow("Camera", frame)
+            if cv.waitKey(1) != -1:
+                break
+            
+            if not self.detector.update_knuckles_coordinates(0.3, False):
+                continue
+            
+            # if self.detector.is_two_finger_extended(['index', 'middle'], 0.1):
+            #     print('two fingers')
+            # else:
+            #     print('-----')
+            # x, y, _ = self.detector.HAND_KNUCKLES_COORDINATES[8]
+            # print(
+            #     f"INDEX: ({x=}, {y=})"
+            #     )
+            x, y, _ = self.detector.HAND_KNUCKLES_COORDINATES[12]
+            print(
+                f"MIDDLE: ({x=}, {y=})"
+            )
+        
 
     def cleanup(self):
         self.camera.release()
@@ -95,4 +134,5 @@ class HandControlApp:
 if __name__ == "__main__":
 
     app = HandControlApp()
-    app.run_computer_interface()
+    # app.run_computer_interface()
+    app.run_debugging()
