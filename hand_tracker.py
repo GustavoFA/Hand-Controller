@@ -3,7 +3,7 @@ import math
 import cv2 as cv
 import numpy as np
 import mediapipe as mp
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 from mediapipe.tasks import python
 from mediapipe import Image, ImageFormat
 from mediapipe.tasks.python import vision
@@ -206,6 +206,24 @@ class HandTracker:
         return (
             self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][1]][axis] + beta
             < self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][0]][axis]
+        )
+        
+    def is_two_finger_extended(self, fingers: List[str], beta: float = 0) -> bool:
+        """
+        Determine whether two specific fingers are extended.
+        
+        Args:
+            fingers (List[str]): A list of two fingers ('thumb', 'index', 'middle', 'ring', 'pinky').
+                Example = ['index', 'middle']
+            beta (float): linear value to create a threshold of finger extended.
+        Returns:
+            bool: True if the fingers are extended.
+        """
+        if len(fingers) != 2:
+            raise ValueError("Exactly two fingers must be proveded.")
+        return (
+            self.is_finger_extended(fingers[0], beta) and 
+            self.is_finger_extended(fingers[1], beta)
         )
 
     def update_knuckles_coordinates(self, target_score: float = 0.98, verbose: bool = True) -> bool:
