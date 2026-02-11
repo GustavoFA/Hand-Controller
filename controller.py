@@ -1,4 +1,5 @@
 import pyautogui
+import numpy as np
 
 class ComputerInputController:
     """
@@ -38,6 +39,16 @@ class ComputerInputController:
         self.prev_y /= self.screen_h
         # EMA factor
         self.alpha = alpha
+        # Scrolling cursor position
+        self.scroll_x = None
+        self.scroll_y = None
+    
+    def update_previous_coordinates(self, x: float = None, y: float = None) -> None:
+        """
+        Update 
+        """
+        self.scroll_x = x
+        self.scroll_y = y
 
     @staticmethod
     def controller_buttons(commands:dict[str, bool]) -> None:
@@ -60,6 +71,19 @@ class ComputerInputController:
             else:
                 pyautogui.keyUp(key)
 
+    def scroll(self, x: float, y: float, gama : float = 1.0) -> None:
+        """
+        Scrolling 
+        """
+        if self.scroll_x is None:
+            self.scroll_x, self.scroll_y = x, y
+            return
+        if np.abs(self.scroll_x - x) > np.abs(self.scroll_y - y):
+            pyautogui.keyDown('shift')
+            pyautogui.scroll(gama * (self.scroll_x - x))
+            pyautogui.keyUp('shift')
+        else:
+            pyautogui.scroll(gama * (self.scroll_y - y))
 
     def straight_move(self, x: float, y: float) -> None:
         """
