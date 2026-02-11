@@ -57,7 +57,7 @@ class HandControlApp:
         self.cleanup()
 
     def run_computer_interface(self, minimum_hand_score:float=0.3, skip_frame:bool=True):
-
+        lmb_pressed = False
         while True:
             ret, frame = self.camera.read()
             if not ret:
@@ -75,6 +75,14 @@ class HandControlApp:
             if self.detector.is_finger_extended('index', 0.22):
                 x, y, _ = self.detector.HAND_KNUCKLES_COORDINATES[8]
                 self.controller.smooth_move(x, y)
+
+            pinched = self.detector.is_tweezers(0.04)
+            if pinched and not lmb_pressed:
+                pyautogui.mouseDown(button='left')
+                lmb_pressed = True
+            elif not pinched and lmb_pressed:
+                pyautogui.mouseUp('left')
+                lmb_pressed = False
 
         self.cleanup()
 

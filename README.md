@@ -51,16 +51,18 @@ Make sure your webcam is connected and accessible.
 
 - Add gesture smoothing and debouncing
 - Support multiple hands
-- Use the computer without a mouse and keyboard :
-    For this case we could create 4 commands, which are mouse control (index finger extended), LMB click (pincer grasp), RMB click (pinky externded) and scroll wheel (movement of two fingers, index and middle together). Furthermore, we could add a "menu" to select the app mode.
+- Use the computer without a mouse and keyboard : (IN DEVELOPMENT)
+    For this case we could create 4 commands, which are mouse control (index finger extended) [DONE], LMB click (pincer grasp) [IN DEVELOPMENT], RMB click (pinky externded) and scroll wheel (movement of two fingers, index and middle together). Furthermore, we could add a "menu" to select the app mode.
 
 ### Issues fixed
 
 - Highly latency : The keyboard commands have a lot of latency between each comand. The main bottleneck appears to be OS-level input calls. This was fixed by reducing OS calls and disable unnecessary PyAutoGUI delays. Another way to reduce latency is by using other libraries, like `pynput`, `evdev` (Linux) or `virtual gamepad` (vgamepad).
 
+- Mouse cursor jittering : When trying to control the mouse cursor with index finger, the cursor was jittering. The solution was to use a smoothing movement with `alpha = 0.2` and fix de X and Y values in the original function. Furthermore, I inverted the X values and fixed the the issue where the screen size was being mixed with mouse cursor coordinates. Another improvement was adding a linear threshold value to the finger-extended detector function, which better separetes when the finger is extended or not.
+
 ### Issues
 
-- Hand mouse movement is jittery - we solution with smooth moviment (alpha = 0.2) and inverting the X values.
+.
 
 ## References
 - [MediaPipe](https://ai.google.dev/edge/mediapipe/solutions/guide)
