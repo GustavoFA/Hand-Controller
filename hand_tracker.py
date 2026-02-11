@@ -150,7 +150,6 @@ class HandTracker:
     # Gesture detection
     # ------------------------------------------------------------------
 
-    # TODO - Find the threshold values
     def is_tweezers(self, threshold: float, verbose : bool = False) -> bool:
         """
         Detect a tweezers gesture (thumb tip close to index tip).
