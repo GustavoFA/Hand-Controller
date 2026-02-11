@@ -26,7 +26,7 @@ This project leverages MediaPipe Hand Landmarker to detect and track hand landma
 - MediaPipe – hand landmark detection
 - OpenCV – camera input & image processing
 - PyAutoGUI – mouse and keyboard control
-- NumPy
+- NumPy #conflict - Last time I use 2.2.4
 
 ## Model File
 You need the MediaPipe Hand Landmarker model. Download it in the link below and place the file in your project root (or update the path in the code).
@@ -62,7 +62,7 @@ Make sure your webcam is connected and accessible.
 
 ### Issues
 
-.
+- Ubuntu uses Wayland - you need to change to X11. (to check this, use `echo $XDG_SESSION_TYPE`)
 
 ## References
 - [MediaPipe](https://ai.google.dev/edge/mediapipe/solutions/guide)
