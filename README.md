@@ -51,7 +51,8 @@ Make sure your webcam is connected and accessible.
 
 - Add gesture smoothing and debouncing
 - Support multiple hands
-- Use the computer without a mouse and keyboard
+- Use the computer without a mouse and keyboard :
+    For this case we could create 4 commands, which are mouse control (index finger extended), LMB click (pincer grasp), RMB click (pinky externded) and scroll wheel (movement of two fingers, index and middle together). Furthermore, we could add a "menu" to select the app mode.
 
 ### Issues fixed
 
@@ -59,7 +60,7 @@ Make sure your webcam is connected and accessible.
 
 ### Issues
 
-- Hand mouse movement is jittery
+- Hand mouse movement is jittery - we solution with smooth moviment (alpha = 0.2) and inverting the X values.
 
 ## References
 - [MediaPipe](https://ai.google.dev/edge/mediapipe/solutions/guide)

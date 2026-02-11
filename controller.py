@@ -13,7 +13,7 @@ class ComputerInputController:
         - Map hand gestures or tracking finger coordinates to OS-level inputs.
     """
 
-    def __init__(self, alpha:float=0.3):
+    def __init__(self, alpha:float=0.2):
         """
         Init the input controller.
 
@@ -34,6 +34,8 @@ class ComputerInputController:
         self.screen_w, self.screen_h = pyautogui.size()
         # Initial mouse position
         self.prev_x, self.prev_y = pyautogui.position()
+        self.prev_x /= self.screen_w
+        self.prev_y /= self.screen_h
         # EMA factor
         self.alpha = alpha
 
@@ -69,7 +71,7 @@ class ComputerInputController:
             x (float): Normalized horizontal coordinate (0.0 - 1.0)
             y (float): Normalized vertical coordinate (0.0 - 1.0)
         """
-        x = int(x * self.screen_w)
+        x = int((1 - x) * self.screen_w)
         y = int(y * self.screen_h)
         pyautogui.moveTo(x, y)
 
@@ -88,8 +90,11 @@ class ComputerInputController:
             self.prev_x, self.prev_y = x, y
 
         # Apply EMA smoothing
-        x = int(self.alpha * x + (1 - self.alpha) * self.prev_x)
-        y = int(self.alpha * y + (1 - self.alpha) * self.prev_y)
-
+        x = self.alpha * x + (1 - self.alpha) * self.prev_x
+        y = self.alpha * y + (1 - self.alpha) * self.prev_y
         self.prev_x, self.prev_y = x, y
-        pyautogui.moveTo(x, y)
+
+        screen_w = int((1 - x) * self.screen_w)
+        screen_h = int(y * self.screen_h)
+
+        pyautogui.moveTo(screen_w, screen_h)
