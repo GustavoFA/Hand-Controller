@@ -151,7 +151,7 @@ class HandTracker:
     # ------------------------------------------------------------------
 
     # TODO - Find the threshold values
-    def is_tweezers(self, threshold: float, target_score: float = 0.98) -> bool:
+    def is_tweezers(self, threshold: float, verbose : bool = False) -> bool:
         """
         Detect a tweezers gesture (thumb tip close to index tip).
 
@@ -162,24 +162,19 @@ class HandTracker:
         Returns:
             bool: True if tweezers gesture is detected.
         """
-        # result = self.get_results()
 
         if not self.results or not self.results.hand_landmarks:
-            return False
-        
-        # Take the first hand
-        if self.results.handedness[0][0].score < target_score:
             return False
         
         landmarks = self.results.hand_landmarks[0]
 
         # 4 represents thumb tip and 8 represents index finger tip
         distance = self._distance_2d(landmarks[4], landmarks[8])
-        print(distance)
+        if verbose : print(f'[4] - [8] = {distance}')
 
         return distance < threshold
 
-    # TODO - this function works with the palm, but back of the hand doesn't work
+    # TODO - this function works with the palm, but back of the hand doesn't work -> read this link https://github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/hands.md
     def is_finger_extended(self, finger: str, beta: float = 0) -> bool:
         """
         Determine whether a specific finger is extended.
@@ -191,6 +186,7 @@ class HandTracker:
         Args:
             finger (str): Finger name ('thumb', 'index', 'middle', 'ring', 'pinky').
             beta (float): linear value to create a threshold of finger extended.
+                For index finger movement beta=0.22 works very well.
 
         Returns:
             bool: True if the finger is extended.
