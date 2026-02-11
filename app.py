@@ -81,7 +81,7 @@ class HandControlApp:
                 pyautogui.mouseDown(button='left')
                 lmb_pressed = True
             elif not pinched and lmb_pressed:
-                pyautogui.mouseUp('left')
+                pyautogui.mouseUp(button='left')
                 lmb_pressed = False
 
         self.cleanup()
