@@ -72,9 +72,8 @@ class HandControlApp:
             if not self.detector.update_knuckles_coordinates(minimum_hand_score, verbose=False):
                 continue    
             
-            if self.detector.is_finger_extended('index'):
+            if self.detector.is_finger_extended('index', 0.22):
                 x, y, _ = self.detector.HAND_KNUCKLES_COORDINATES[8]
-                # self.controller.straight_move(x, y)
                 self.controller.smooth_move(x, y)
 
         self.cleanup()

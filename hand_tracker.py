@@ -180,7 +180,7 @@ class HandTracker:
         return distance < threshold
 
     # TODO - this function works with the palm, but back of the hand doesn't work
-    def is_finger_extended(self, finger: str) -> bool:
+    def is_finger_extended(self, finger: str, beta: float = 0) -> bool:
         """
         Determine whether a specific finger is extended.
 
@@ -190,6 +190,7 @@ class HandTracker:
 
         Args:
             finger (str): Finger name ('thumb', 'index', 'middle', 'ring', 'pinky').
+            beta (float): linear value to create a threshold of finger extended.
 
         Returns:
             bool: True if the finger is extended.
@@ -206,9 +207,8 @@ class HandTracker:
             axis = 0 # X
         else:
             axis = 1 # Y
-        # return True if self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][1]][axis] < self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][0]][axis] else False
         return (
-            self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][1]][axis] 
+            self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][1]][axis] + beta
             < self.HAND_KNUCKLES_COORDINATES[self.FINGER_INDEX[finger][0]][axis]
         )
 
