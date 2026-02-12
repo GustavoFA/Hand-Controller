@@ -43,13 +43,6 @@ class ComputerInputController:
         self.scroll_x = None
         self.scroll_y = None
     
-    def update_previous_coordinates(self, x: float = None, y: float = None) -> None:
-        """
-        Update 
-        """
-        self.scroll_x = x
-        self.scroll_y = y
-
     @staticmethod
     def controller_buttons(commands:dict[str, bool]) -> None:
         """
@@ -71,19 +64,31 @@ class ComputerInputController:
             else:
                 pyautogui.keyUp(key)
 
-    def scroll(self, x: float, y: float, gama : float = 1.0) -> None:
+    def scroll(self, x: float, y: float, gamma : float = 100.0) -> None:
         """
-        Scrolling 
+        Scroll the screen using relative finger movement.
+        Vertical and horizontal scroll.
+
+        Args:
+            x (float): Normalized horizontal coordinate (0.0 - 1.0)
+            y (float): Normalized vertical coordinate (0.0 - 1.0)
+            gamma (float): Sensitivity scaling factor.
         """
         if self.scroll_x is None:
             self.scroll_x, self.scroll_y = x, y
             return
-        if np.abs(self.scroll_x - x) > np.abs(self.scroll_y - y):
-            pyautogui.keyDown('shift')
-            pyautogui.scroll(gama * (self.scroll_x - x))
-            pyautogui.keyUp('shift')
+
+        dx = x - self.scroll_x
+        dy = y - self.scroll_y
+
+        if abs(dy) > abs(dx):
+            pyautogui.scroll(int(-dy * gamma))
         else:
-            pyautogui.scroll(gama * (self.scroll_y - y))
+            pyautogui.keyDown('shift')
+            pyautogui.scroll(int(-dx * gamma))
+            pyautogui.keyUp('shift')
+
+        self.scroll_x, self.scroll_y = x, y
 
     def straight_move(self, x: float, y: float) -> None:
         """
