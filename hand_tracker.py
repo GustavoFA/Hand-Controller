@@ -167,6 +167,8 @@ class HandTracker:
         
         landmarks = self.results.hand_landmarks[0]
 
+        # check thumb marks before
+
         # 4 represents thumb tip and 8 represents index finger tip
         distance = self._distance_2d(landmarks[4], landmarks[8])
         if verbose : print(f'[4] - [8] = {distance}')
