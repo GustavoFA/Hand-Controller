@@ -12,13 +12,15 @@ This project leverages MediaPipe Hand Landmarker to detect and track hand landma
 
 ## Gesture Commands
 
-| Gesture                          | Controller action                  |
-| -------------------------------- | ---------------------------------- |
-| Index finger extended            | Space                              |
-| Middle finger extended           | W                                  |
-| Pinky finger extended            | A                                  |
-| Thumb finger extended            | D                                  |
-| Closed hand                      | Neutral state (no action)          |
+| Gesture                          | Controller action                  | Mouse action                  |
+| -------------------------------- | ---------------------------------- | ----------------------------- |
+| Index finger extended            | Space                              | Mouse cursor                  | 
+| Middle finger extended           | W                                  | -                             |
+| Pinky finger extended            | A                                  | RMB click                     |
+| Thumb finger extended            | D                                  | -                             |
+| Closed hand                      | Neutral state (no action)          | Neutral state (no action)     |
+| Pinching                         | -                                  | LMB click                     |
+| Index and middle finger extended | -                                  | Scroll                        | 
 
 ## Requirements
 
@@ -39,7 +41,17 @@ https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/
 git clone https://github.com/GustavoFA/Hand-Controller.git
 cd Hand-Controller
 python -m venv .venv
-source .venv/bin/activate  # Linux/macOS
+```
+For Linux/MacOS
+```
+source .venv/bin/activate  
+```
+For Windows
+```
+.venv\Scripts\activate
+```
+Then
+```
 pip install -r requirements.txt
 python main.py
 ```
@@ -49,10 +61,13 @@ Make sure your webcam is connected and accessible.
 
 ### Future Improvements
 
-- Add gesture smoothing and debouncing
 - Support multiple hands
 - Use the computer without a mouse and keyboard : (IN DEVELOPMENT)
-    For this case we could create 4 commands, which are mouse control (index finger extended) [DONE], LMB click (pincer grasp) [IN DEVELOPMENT], RMB click (pinky externded) and scroll wheel (movement of two fingers, index and middle together). Furthermore, we could add a "menu" to select the app mode.
+    For this case we could create 4 commands, which are mouse control (index finger extended) [DONE], LMB click (pincer grasp) [DONE], RMB click (pinky externded) [DONE] and scroll wheel (movement of two fingers, index and middle together) [IN DEVELOPMENT]. 
+- Add a "menu" to select the app mode (gamer, mouse or keyboard).
+- Allows to define custom commands in gamer mode.
+- Implement a keyboard using sign language detection.
+- Increase the number of possible commands (currently, there are only 5 - one per finger).
 
 ### Issues fixed
 
@@ -60,9 +75,14 @@ Make sure your webcam is connected and accessible.
 
 - Mouse cursor jittering : When trying to control the mouse cursor with index finger, the cursor was jittering. The solution was to use a smoothing movement with `alpha = 0.2` and fix de X and Y values in the original function. Furthermore, I inverted the X values and fixed the the issue where the screen size was being mixed with mouse cursor coordinates. Another improvement was adding a linear threshold value to the finger-extended detector function, which better separetes when the finger is extended or not.
 
+- Ubuntu doesn't accept virtual input commands - Check if the system is running in Wayland mode (use `echo $XDG_SESSION_TYPE` in the terminal). If so, switch to x11.
+
 ### Issues
 
-- Ubuntu uses Wayland - you need to change to X11. (to check this, use `echo $XDG_SESSION_TYPE`)
+- Can't move mouse cursor while pinching.
+- LMB misclicks - check the thumb coordinates.
+- Hand threshold/space issue - To move the mouse, the camera must see the entire hand. Near the edges of the frame, parts of the hand are lost, causing detection failure and, consequently, mouse movement failure.
+- Loss of finger extension detection - sometimes, when moving the hand with index finger extended, the system temporality fails to detect it and then recovers. This may be related to the `beta` parameter.
 
 ## References
 - [MediaPipe](https://ai.google.dev/edge/mediapipe/solutions/guide)
