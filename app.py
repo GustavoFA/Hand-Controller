@@ -9,9 +9,9 @@ from self_segmentation import SelfSegmentationTools
 class HandControlApp:
     """
     A collection of control forms:
-    - joystick
-    - keyboard
-    - hand mouse
+    - joystick (run_controller_for_game)
+    - mouse (run_computer_interface)
+    - keyboard (run_keyboard)
     """
 
     def __init__(self):
@@ -24,6 +24,18 @@ class HandControlApp:
         # self.segmenter_tool = SelfSegmentationTools() # to be explored
 
     def run_controller_for_game(self, minimum_hand_score:float=0.5, skip_frame:bool=True):
+        """
+        Hand-based game controller.
+
+        This method captures frames from the camera, detects hand landmarks,
+        and maps specific finger gestures to keyboard key presses.
+
+        Args:
+            minimum_hand_score (float):
+                Minimum confidence score required to consider the hand detection valid.
+            skip_frame (bool):
+                If True, processes every other frame to reduce latency and CPU usage.
+        """
         commands = {
             'index': 'space',
             'thumb': 'd',
@@ -56,8 +68,27 @@ class HandControlApp:
                     key_states[finger] = False
         self.cleanup()
 
-    def run_computer_interface(self, minimum_hand_score:float=0.3, skip_frame:bool=True):
+    def run_computer_interface(self, minimum_hand_score:float=0.3):
+        """
+        Hand-gesture-based computer interface.
+
+        This method captures frames from the camera, detects hand landmarks,
+        and maps specific gestures to mouse actions:
+
+            - Index finger → Move cursor
+            - Pincer grasp (thumb + index) → Left mouse click (hold)
+            - Pinky finger → Right mouse click
+            - Index + Middle fingers → Scroll
+
+        The loop runs continuously until the user presses the space key.
+
+        Args:
+            minimum_hand_score (float):
+                Minimum confidence score required to accept hand detection.
+                Frames below this threshold are ignored.
+        """
         lmb_pressed = False
+        rmb_pressed = False
         while True:
             ret, frame = self.camera.read()
             if not ret:
@@ -66,18 +97,22 @@ class HandControlApp:
             self.detector.get_results(frame)
 
             cv.imshow("Camera", frame)
-            if cv.waitKey(1) != -1:
+            # Stop with space key
+            if cv.waitKey(1) == 32: 
                 break
 
             if not self.detector.update_knuckles_coordinates(minimum_hand_score, verbose=False):
                 continue    
             
-            if self.detector.is_finger_extended('index', 0.22):
+            if self.detector.is_two_finger_extended(['index', 'middle'], 0.2):
+                x_scroll, y_scroll, _ = self.detector.HAND_KNUCKLES_COORDINATES[12]
+                self.controller.scroll(x_scroll, y_scroll)
+                continue
+            elif self.detector.is_finger_extended('index', 0.22): # It doesn't work when pincer grasp
                 x, y, _ = self.detector.HAND_KNUCKLES_COORDINATES[8]
                 self.controller.smooth_move(x, y)
-            elif self.detector.is_two_finger_extended(['index', 'middle'], 0.2):
-                x, y, _ = self.detector.HAND_KNUCKLES_COORDINATES[12]
 
+            # LMB click
             pinched = self.detector.is_tweezers(0.04)
             if pinched and not lmb_pressed:
                 pyautogui.mouseDown(button='left')
@@ -86,17 +121,31 @@ class HandControlApp:
                 pyautogui.mouseUp(button='left')
                 lmb_pressed = False
             
-            # RMB
-            if self.detector.is_finger_extended('pinky', 0.1):
-                pass
-            
-            # Scroll movement
-            if self.detector.is_two_finger_extended(['index', 'middle'], 0.1):
-                pass
+            # RMB click
+            rmb_status = self.detector.is_finger_extended('pinky', 0.1)
+            if  rmb_status and not rmb_pressed:
+                pyautogui.rightClick()
+                rmb_pressed = True
+            elif not rmb_status and rmb_pressed:
+                rmb_pressed = False
 
         self.cleanup()
 
+    # TODO - Next method (NOT STARTED)
+    def run_keyboard(self) -> None:
+        """
+        Hand-gesture-based virtual keyboard.
+
+        This method will capture hand gestures (e.g., sign language or
+        predefined finger configurations) and convert them into
+        keyboard text input.
+        """
+        pass
+
     def run_debugging(self) -> None:
+        """
+        Debugging mode
+        """
         
         while True:
             ret, frame = self.camera.read()
@@ -134,5 +183,6 @@ class HandControlApp:
 if __name__ == "__main__":
 
     app = HandControlApp()
-    # app.run_computer_interface()
-    app.run_debugging()
+    # app.run_debugging()
+    # app.run_controller_for_game()
+    app.run_computer_interface()
