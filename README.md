@@ -77,6 +77,8 @@ Make sure your webcam is connected and accessible.
 
 - Ubuntu doesn't accept virtual input commands - Check if the system is running in Wayland mode (use `echo $XDG_SESSION_TYPE` in the terminal). If so, switch to x11.
 
+- Hand threshold/space issue : To move the mouse, the camera must see the entire hand. Near the edges of the frame, parts of the hand may be cut off, causing detection failure and, consequently, loss of mouse control. This was fixed by introducing a virtual bounding box in camera frame. With this approach, the mouse cursor reaches the screen edges before hand detection fails.
+
 ### Issues
 
 - Can't move mouse cursor while pinching.
