@@ -1,5 +1,6 @@
 import pyautogui
 import numpy as np
+from typing import Tuple
 
 class ComputerInputController:
     """
@@ -42,6 +43,36 @@ class ComputerInputController:
         # Scrolling cursor position
         self.scroll_x = None
         self.scroll_y = None
+
+    @staticmethod
+    def virtual_bounding_box_control(x: float, y: float, control_margin: float = 0.15) -> Tuple[float, float]:
+        """
+        Remap normalized hand coordinates (0-1) into a virtual control region.
+
+        Creates an inner active area inside the camera frame and streches it to the full [0, 1] range.
+        This prevents cursor loss near image borders, where hand detection becomes unreliable.
+
+        Args:
+            x (float): Normalized horizontal coordinate (0.0 - 1.0)
+            y (float): Normalized vertical coordinate (0.0 - 1.0)
+            control_margin (float): Horizontal margin removed from each size. 
+                Must be in [0, 0.5). Larger values increase stability but 
+                reduce usable camera space.
+        """
+        
+        if not (0 <= control_margin < 0.5):
+            raise ValueError("Control margin must be in [0, 0.5)")
+        # Vertical scaling factor to increase stability
+        y_factor = 3 
+        # Clip to safe zone
+        x = np.clip(x, control_margin, 1 - control_margin)
+        y = np.clip(y, y_factor * control_margin, 1 - y_factor * control_margin)
+
+        # Remap to full range 0 - 1 range
+        x = (x - control_margin) / (1 - 2 * control_margin)
+        y = (y - y_factor * control_margin) / (1 - 2 * y_factor * control_margin)
+
+        return x, y
     
     @staticmethod
     def controller_buttons(commands:dict[str, bool]) -> None:
@@ -115,11 +146,13 @@ class ComputerInputController:
             x (float): Normalized horizontal coordinate (0.0 - 1.0)
             y (float): Normalized vertical coordinate (0.0 - 1.0)
         """
+        x, y = self.virtual_bounding_box_control(x, y)
+
         if self.prev_x is None:
             self.prev_x, self.prev_y = x, y
 
         # Apply EMA smoothing
-        x = self.alpha * x + (1 - self.alpha) * self.prev_x
+        x = self.alpha * x + (1 - self.alpha) * self.prev_x 
         y = self.alpha * y + (1 - self.alpha) * self.prev_y
         self.prev_x, self.prev_y = x, y
 
