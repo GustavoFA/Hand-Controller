@@ -89,6 +89,7 @@ class HandControlApp:
         """
         lmb_pressed = False
         rmb_pressed = False
+        index_beta = 0.22
         while True:
             ret, frame = self.camera.read()
             if not ret:
@@ -108,7 +109,7 @@ class HandControlApp:
                 x_scroll, y_scroll, _ = self.detector.HAND_KNUCKLES_COORDINATES[12]
                 self.controller.scroll(x_scroll, y_scroll)
                 continue
-            elif self.detector.is_finger_extended('index', 0.22): # It doesn't work when pincer grasp
+            elif self.detector.is_finger_extended('index', index_beta): # It doesn't work when pincer grasp
                 x, y, _ = self.detector.HAND_KNUCKLES_COORDINATES[8]
                 self.controller.smooth_move(x, y)
 
