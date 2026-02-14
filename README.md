@@ -62,8 +62,8 @@ Make sure your webcam is connected and accessible.
 ### Future Improvements
 
 - Support multiple hands
-- Use the computer without a mouse and keyboard : (IN DEVELOPMENT)
-    For this case we could create 4 commands, which are mouse control (index finger extended) [DONE], LMB click (pincer grasp) [DONE], RMB click (pinky externded) [DONE] and scroll wheel (movement of two fingers, index and middle together) [IN DEVELOPMENT]. 
+- Use the computer without a mouse and keyboard :
+    For this case we could create 4 commands, which are mouse control (index finger extended) [DONE], LMB click (pincer grasp) [DONE], RMB click (pinky externded) [DONE] and scroll wheel (movement of two fingers, index and middle together) [DONE]. 
 - Add a "menu" to select the app mode (gamer, mouse or keyboard).
 - Allows to define custom commands in gamer mode.
 - Implement a keyboard using sign language detection.
@@ -83,7 +83,6 @@ Make sure your webcam is connected and accessible.
 
 - Can't move mouse cursor while pinching.
 - LMB misclicks - check the thumb coordinates.
-- Hand threshold/space issue - To move the mouse, the camera must see the entire hand. Near the edges of the frame, parts of the hand are lost, causing detection failure and, consequently, mouse movement failure.
 - Loss of finger extension detection - sometimes, when moving the hand with index finger extended, the system temporality fails to detect it and then recovers. This may be related to the `beta` parameter.
 
 ## References
