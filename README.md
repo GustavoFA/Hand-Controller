@@ -62,8 +62,6 @@ Make sure your webcam is connected and accessible.
 ### Future Improvements
 
 - Support multiple hands
-- Use the computer without a mouse and keyboard :
-    For this case we could create 4 commands, which are mouse control (index finger extended) [DONE], LMB click (pincer grasp) [DONE], RMB click (pinky externded) [DONE] and scroll wheel (movement of two fingers, index and middle together) [DONE]. 
 - Add a "menu" to select the app mode (gamer, mouse or keyboard).
 - Allows to define custom commands in gamer mode.
 - Implement a keyboard using sign language detection.
